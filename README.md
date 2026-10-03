@@ -7,6 +7,11 @@ validation, and the generators that turn it into `visual-styles.css` and a Tailw
 Pure TypeScript — no Angular, no DOM, no Node APIs — so the panel (browser), the local save server
 (`visualstyles-app`) and broken-stock's agreement test all run the same code.
 
+| Doc | |
+|---|---|
+| [doc/intent/visual-styles-format.intent.md](doc/intent/visual-styles-format.intent.md) | Why it exists, the rules that must not be broken |
+| [doc/usage/visual-styles-format.usage.md](doc/usage/visual-styles-format.usage.md) | Calling it, with real output |
+
 ## Usage
 
 ```ts
@@ -97,12 +102,14 @@ order. `readGeneratorStamp(css)` reads the stamp back.
 }
 ```
 
-Measured on tailwindcss 4.3.3: with `inline`, utilities are written with the value itself
-(`.text-profit { color: var(--vs-profit-text) }`, `text-profit/50` becomes a `color-mix` of it) and
-Tailwind emits **no** `:root` declaration of `--color-profit`. The generated CSS's legacy alias is
-then the only definition of `--color-profit`, so no load order decides between two owners, and a
-live edit of `--vs-profit-text` repaints utilities, `var(--color-profit)` users and charts alike.
-Plain `@theme` would also emit `:root { --color-profit: … }`, a second definition of the same name.
+With `inline` (tailwindcss 4.3.3), utilities are written with the variable itself
+(`.text-profit { color: var(--vs-profit-text) }`, `text-profit/50` becomes a `color-mix` of it), so
+a live edit of `--vs-profit-text` repaints utilities, `var(--color-profit)` users and charts alike.
+
+Tailwind still writes its own copy of each name inside `@layer theme` (`--color-profit:
+var(--vs-profit-text)`, measured in broken-stock's real build). It has the same value, and the
+generated legacy alias sits outside any layer and so always wins. That is why the panel edits only
+`--vs-*` names, never `--color-*`.
 
 ## Helpers
 
