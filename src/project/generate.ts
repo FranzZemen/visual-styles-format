@@ -96,16 +96,15 @@ export function generateCss(input: unknown, options: GenerateOptions = {}): stri
  * The Tailwind v4 theme block for `tailwind: true` colour entries (D11):
  *
  *   @theme inline {
- *     --color-profit: var(--vs-color-profit);
+ *     --color-profit: var(--vs-profit);
  *   }
  *
- * `inline` is deliberate (measured on tailwindcss 4.3.3): utilities are then written with the value
- * itself — `.text-profit { color: var(--vs-color-profit) }` — and Tailwind emits NO `:root`
- * declaration of `--color-profit`. So the generated CSS's legacy alias is the only definition of
- * `--color-profit`, there is no second definition whose load order decides which wins, and a live
- * edit of `--vs-color-profit` repaints Tailwind utilities, `var(--color-profit)` users and charts
- * alike. Without `inline`, Tailwind would ALSO emit `:root { --color-profit: … }`, a second owner of
- * the same name. Throws VisualStylesInvalidError.
+ * `inline` is deliberate (tailwindcss 4.3.3): utilities are written with the value itself —
+ * `.text-profit { color: var(--vs-profit) }` — so a live edit of `--vs-profit` repaints Tailwind
+ * utilities, `var(--color-profit)` users and charts alike. Tailwind still writes its own copy of
+ * `--color-profit` inside `@layer theme` (measured in broken-stock's build, E3); that is harmless:
+ * it holds the same `var(--vs-profit)`, and the generated CSS's legacy alias sits outside any
+ * layer, so it wins whatever the load order. Throws VisualStylesInvalidError.
  */
 export function generateTailwindTheme(input: unknown, options: GenerateOptions = {}): string {
   const file: VisualStylesFile = assertValidVisualStyles(input);
