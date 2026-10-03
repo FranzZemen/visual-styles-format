@@ -4,4 +4,4 @@ License Type: UNLICENSED
 */
 
 export const PACKAGE_NAME = '@franzzemen/visual-styles-format';
-export const PACKAGE_VERSION = '1.0.0';
+export const PACKAGE_VERSION = '1.1.0';
