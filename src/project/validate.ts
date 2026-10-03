@@ -17,7 +17,8 @@ Rules:
   - a follow names an existing entry of the same kind, never leads back to itself (loops refused),
     and only colours may add an opacity, 0–100;
   - `background`, `tailwind` are colour-only; `background` names an existing colour entry;
-  - chart rules: one class scope, class-only descendant selector, an allowed property for the kind,
+  - chart rules: one class scope, class-only descendant selector (optionally ending in one
+    element name from SELECTOR_ELEMENTS, E21), an allowed property for the kind,
     and no two entries drive the same (scope, selector, property);
   - legacy names look like `--color-profit`, never `--vs-…`, and are unique; Tailwind theme names
     are unique;
@@ -27,7 +28,7 @@ Rules:
 
 import {
   cssVarName, formatNumber, forbiddenFragment, isAllowedProperty, isNumberUnit, isValidColour,
-  isValidLegacyName, isValidName, isValidScope, isValidSelector
+  isValidLegacyName, isValidName, isValidScope, isValidSelector, SELECTOR_ELEMENTS
 } from './grammar.js';
 import {tailwindThemeName} from './names.js';
 import type {Entry, ValidationCode, ValidationError, VisualStylesFile} from './types.js';
@@ -222,7 +223,7 @@ function validateEntryShape(raw: unknown, path: string, c: Collector): void {
           const s = c.cssString(rule['selector'], `${rp}.selector`, MAX_SELECTOR_LENGTH, label);
           if (s !== undefined && !isValidSelector(s)) {
             c.add(`${rp}.selector`, 'bad-selector',
-              `'${s}' must be class selectors joined by single spaces, e.g. .bs-s-ema9 .highcharts-graph`, label);
+              `'${s}' must be class selectors joined by single spaces, optionally ending in one of ${SELECTOR_ELEMENTS.join(', ')}, e.g. .bs-s-ema9 .highcharts-graph or .highcharts-button text`, label);
           }
         }
         if (has(rule, 'property')) {

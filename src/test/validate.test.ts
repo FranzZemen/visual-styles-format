@@ -240,6 +240,15 @@ describe('validate', () => {
   describe('chart rules', () => {
     const rule = (o: Record<string, unknown> = {}) => ({scope: '.bs-chart-since', selector: '.bs-s-a .highcharts-graph', property: 'stroke', ...o});
     it('accepts a valid rule', () => expect(codes(file(entry({name: 'a', chart: [rule()]})))).to.deep.equal([]));
+    it('accepts a selector ending in an allowed element name (E21)', () => {
+      for (const selector of ['.highcharts-button text', '.highcharts-range-label rect', '.a .b tspan', '.a path']) {
+        expect(codes(file(entry({name: 'a', chart: [rule({selector})]}))), selector).to.deep.equal([]);
+      }
+    });
+    it('names the allowed elements when it refuses a selector', () => {
+      const errors = validateVisualStyles(file(entry({name: 'a', chart: [rule({selector: '.a div'})]})));
+      expect(errors[0]!.message).to.contain('path, rect, text, tspan');
+    });
     it('refuses a non-array chart', () => only(file(entry({name: 'a', chart: rule() as never})), 'wrong-type'));
     it('refuses a non-object rule', () => only(file(entry({name: 'a', chart: ['x' as never]})), 'not-object'));
     it('refuses missing rule fields', () => {
@@ -251,7 +260,7 @@ describe('validate', () => {
       only(file(entry({name: 'a', chart: [rule({scope: '.a .b'})]})), 'bad-scope');
     });
     it('refuses a bad selector', () => {
-      for (const selector of ['.a + .b', 'path', '.a[x]', '.a:hover', '.a,.b']) {
+      for (const selector of ['.a + .b', 'path', '.a[x]', '.a:hover', '.a,.b', '.a text .b', '.a div', '.a Text']) {
         only(file(entry({name: 'a', chart: [rule({selector})]})), 'bad-selector');
       }
     });

@@ -124,6 +124,7 @@ readGeneratorStamp(css);                 // {version: '1.0.0', formatVersion: 1}
 | `parseColour(text)` / `isValidColour(text)` / `formatRgba(rgba)` | `{r,g,b,a}` or `undefined` / boolean / `rgba(…)` |
 | `cssVarName(name)` / `tailwindThemeName(name, legacyName?)` | `--vs-…` / `--color-…` |
 | `isValidName`, `isValidLegacyName`, `isValidScope`, `isValidSelector`, `isAllowedProperty`, `forbiddenFragment` | grammar checks |
+| `selectorElement`, `SELECTOR_ELEMENTS` | the element name a selector ends with (`text` for `.highcharts-button text`), and the allowed list |
 
 Constants: `FORMAT_VERSION` (1), `NUMBER_UNITS`, `DEFAULT_BACKGROUND` (`'surface'`),
 `COLOUR_PROPERTIES`, `NUMBER_PROPERTIES`, `NAME_PATTERN`, `LEGACY_NAME_PATTERN`, `MAX_*_LENGTH`,

@@ -7,8 +7,9 @@ The strict value grammar (broken-stock/doc/prd/visual-styles.prd.md D22).
 WHY STRICT. The local save server accepts a value from a browser tab and the generated CSS is
 committed and shipped. Any site open in the same browser could try to post a "colour" that is really
 CSS — `red; } body { background: url(https://…) }` — so every string that reaches the CSS must match
-a grammar that cannot express anything but a colour, a number, a name or a class selector. Values are
-REFUSED, never cleaned: a cleaned value is a value nobody typed.
+a grammar that cannot express anything but a colour, a number, a name or a class selector (which may
+end in one element name from a fixed list, E21). Values are REFUSED, never cleaned: a cleaned value is
+a value nobody typed.
 
 Everything here is pure: no DOM, no Node APIs, so the panel (browser), the server (Node) and
 broken-stock's agreement test all run the same code.
@@ -49,8 +50,28 @@ export function isValidLegacyName(name: string): boolean {
 const CLASS = '\\.[A-Za-z_][A-Za-z0-9_-]*';
 /** One compound of classes on one element: `.highcharts-point.highcharts-point-up`. */
 const COMPOUND = `(?:${CLASS})+`;
+
+/**
+ * Element names a chart selector may END with (E21). Highcharts draws some words and shapes as
+ * unclassed children of a classed group and colours them only through an element selector in its own
+ * sheet — `.highcharts-button text`, `.highcharts-range-label text`, `.highcharts-range-label rect`,
+ * `.highcharts-legend-item > text`, `.highcharts-state-hover path`. Without an element name those
+ * cannot be settings. The list is the SVG elements Highcharts actually draws that way:
+ *  - `text`  — button words, range label, legend item label, data labels, crosshair label;
+ *  - `tspan` — the lines inside a multi-line or styled `text` (a rule on `text` alone can lose to a
+ *    class Highcharts puts on a `tspan`);
+ *  - `path`  — line, area, marker and button-state shapes;
+ *  - `rect`  — label and range-input boxes.
+ * Deliberately NOT here: HTML elements (`div`, `span` — HTML labels take a class through the format
+ * string, D14), grouping elements (`g`, `svg` — would colour everything under them), and the
+ * universal `*`. Lowercase only, exactly as SVG writes them.
+ */
+export const SELECTOR_ELEMENTS: readonly string[] = ['path', 'rect', 'text', 'tspan'];
+
 const SCOPE_PATTERN = new RegExp(`^${CLASS}$`);
-const SELECTOR_PATTERN = new RegExp(`^${COMPOUND}(?: ${COMPOUND})*$`);
+const SELECTOR_PATTERN = new RegExp(
+  `^${COMPOUND}(?: ${COMPOUND})*(?: (?:${SELECTOR_ELEMENTS.join('|')}))?$`
+);
 
 /** A chart scope is exactly one class selector (the class on the `<highcharts-chart>` host, D18). */
 export function isValidScope(scope: string): boolean {
@@ -58,11 +79,22 @@ export function isValidScope(scope: string): boolean {
 }
 
 /**
- * A chart selector is one or more class compounds joined by single spaces (descendant combinator).
- * No element names, ids, attributes, pseudo-classes, `>`/`+`/`~`, or anything else.
+ * A chart selector is one or more class compounds joined by single spaces (descendant combinator),
+ * optionally ENDING in one bare element name from SELECTOR_ELEMENTS after a space
+ * (`.highcharts-button text`). The element is never first (a rule always starts from a class Highcharts
+ * or the app put there, D12), never compounded with a class (`text.x`), never in the middle, and only
+ * lowercase. No ids, attributes, pseudo-classes, `>`/`+`/`~`, `*`, or anything else. Specificity is
+ * what CSS gives the written selector: an element adds (0,0,1).
  */
 export function isValidSelector(selector: string): boolean {
   return SELECTOR_PATTERN.test(selector);
+}
+
+/** The element name a valid selector ends with (`text` for `.highcharts-button text`), or undefined. */
+export function selectorElement(selector: string): string | undefined {
+  if (!isValidSelector(selector)) return undefined;
+  const last = selector.slice(selector.lastIndexOf(' ') + 1);
+  return SELECTOR_ELEMENTS.includes(last) ? last : undefined;
 }
 
 /** CSS properties a colour entry may drive in a chart rule. */

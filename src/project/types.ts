@@ -47,7 +47,8 @@ export interface ChartRule {
   scope: string;
   /**
    * Class selectors inside it, compound classes allowed, joined only by single spaces
-   * (descendant), e.g. `.bs-s-unrealized .highcharts-graph`.
+   * (descendant), e.g. `.bs-s-unrealized .highcharts-graph`. May END in one bare element name from
+   * SELECTOR_ELEMENTS (`text`, `tspan`, `path`, `rect`), e.g. `.highcharts-button text` (E21).
    */
   selector: string;
   /** The CSS property, from an allow-list that depends on the entry's kind (see grammar.ts). */

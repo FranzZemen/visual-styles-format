@@ -144,6 +144,13 @@ describe('generate', () => {
       expect(css.indexOf('  fill: var(--vs-b);')).to.be.lessThan(css.indexOf('  stroke: var(--vs-b);'));
     });
 
+    it('writes an element-ending selector as written, after the scope (E21)', () => {
+      const css = generateCss(file(
+        entry({name: 'a', chart: [{scope: '.bs-chart-index', selector: '.highcharts-button text', property: 'fill'}]})
+      ), {version: '1.0.0'});
+      expect(css).to.contain('\n.bs-chart-index .highcharts-button text {\n  fill: var(--vs-a);\n}\n');
+    });
+
     it('uses \\n line endings only', () => {
       expect(generateCss(sample())).to.not.contain('\r');
     });

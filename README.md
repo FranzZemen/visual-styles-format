@@ -70,8 +70,14 @@ Unknown fields are refused at every level.
   `#0000`, not `transparent`.
 - **Number:** finite, not exponent form, plus a unit from the list above.
 - **Chart scope:** one class (`.bs-chart-since`). **Selector:** class compounds joined by single
-  spaces (`.bs-s-ema9 .highcharts-graph`, `.highcharts-point.highcharts-point-up`). No elements,
-  ids, attributes, pseudo-classes or other combinators. **Property:** colour entries `fill`, `stroke`,
+  spaces (`.bs-s-ema9 .highcharts-graph`, `.highcharts-point.highcharts-point-up`), optionally
+  **ending** in one bare element name from `SELECTOR_ELEMENTS` — `text`, `tspan`, `path`, `rect`
+  (`.highcharts-button text`, `.highcharts-range-label rect`). The element is lowercase, last, alone
+  in its compound (`text.x` is refused) and preceded by at least one class. Why: Highcharts colours
+  some words and boxes (range-selector buttons, range label, legend item labels) only through an
+  element selector in its own sheet; no class reaches them. `div`/`span` are left out (an HTML label
+  takes a class through its format string), `g`/`svg`/`*` too (they would colour everything inside).
+  No ids, attributes, pseudo-classes or other combinators. **Property:** colour entries `fill`, `stroke`,
   `color`, `background-color`, `border-color`, `outline-color`, `stop-color`; number entries
   `stroke-width`, `font-size`, `font-weight`, `line-height`, `border-width`, `opacity`,
   `fill-opacity`, `stroke-opacity`.

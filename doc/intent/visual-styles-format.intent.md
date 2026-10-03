@@ -50,8 +50,12 @@ fields are refused at every level.
   refused, including `transparent` (write `#0000`), `currentColor` and `color-mix`. Numbers must be
   finite and not in exponent form, with a unit (`px`, `rem`, `em`, `%`, or an explicit `none`). Any
   string bound for CSS that contains `url(`, `;`, `{`, `}`, `\`, `/*`, `*/`, quotes, `<`, `>` or a
-  control character is refused outright. Chart rules allow one scope class, class-only selectors,
-  and a property from a per-kind allow-list.
+  control character is refused outright. Chart rules allow one scope class, class-only selectors
+  (which may end in one element name from a fixed list — `text`, `tspan`, `path`, `rect` — because
+  Highcharts colours some button, range-label and legend words only through an element selector),
+  and a property from a per-kind allow-list. Pseudo-classes (`:hover`) and `!important` are not part
+  of the format: a state Highcharts marks only with `:hover`, or colours with `!important`, stays in
+  a hand-written structural sheet that reads the entry by variable.
   **Why:** the save server listens only on 127.0.0.1, but any website open in Franz's browser could
   still try to post a "colour" that is really CSS (a `url(` that leaks data, a `}` that opens a new
   rule). If it were accepted, it would be committed and shipped. Repairing such input would mean

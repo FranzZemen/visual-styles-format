@@ -11,6 +11,7 @@ import {expect} from 'chai';
 import {
   cssVarName, formatNumber, formatNumberValue, formatRgba, forbiddenFragment, isAllowedProperty,
   isValidColour, isValidLegacyName, isValidName, isValidScope, isValidSelector, parseColour,
+  selectorElement, SELECTOR_ELEMENTS,
   tailwindThemeName
 } from '#project';
 
@@ -115,10 +116,28 @@ describe('grammar', () => {
       it(`refuses scope ${JSON.stringify(s)}`, () => expect(isValidScope(s)).to.be.false);
     }
     for (const s of ['.highcharts-graph', '.bs-s-ema9 .highcharts-graph', '.highcharts-point.highcharts-point-up',
-      '.a .b.c .d', '.highcharts-candlestick-series .highcharts-point-up']) {
+      '.a .b.c .d', '.highcharts-candlestick-series .highcharts-point-up',
+      // E21: one bare element name from the allow-list may END the selector
+      '.highcharts-button text', '.highcharts-range-selector-buttons .highcharts-button-pressed text',
+      '.highcharts-range-label rect', '.bs-legend .highcharts-legend-item tspan', '.highcharts-state-hover path',
+      '.a.b text']) {
       it(`accepts selector ${s}`, () => expect(isValidSelector(s)).to.be.true);
     }
-    for (const s of ['', 'path', '.a > .b', '.a + .b', '.a ~ .b', '.a  .b', ' .a', '.a ', '.a,.b', '.a[fill]',
+    // E21 refusals: the element must be last, alone in its compound, lowercase, on the list, after a class
+    for (const s of ['text', 'path', '.a text text', '.a text .b', '.a text.b', '.a text.b .c', '.a TEXT', '.a Text',
+      '.a g', '.a svg', '.a div', '.a span', '.a circle', '.a text:hover', '.a > text', '.a  text', '.a text ',
+      '.a text[x]', '.a text#x', '.a texts', '.a tex', '.a .text-x text-y']) {
+      it(`refuses element selector ${JSON.stringify(s)}`, () => expect(isValidSelector(s)).to.be.false);
+    }
+    it('names the element a selector ends with', () => {
+      expect(selectorElement('.highcharts-button text')).to.equal('text');
+      expect(selectorElement('.a .b rect')).to.equal('rect');
+      expect(selectorElement('.a .b')).to.be.undefined;
+      expect(selectorElement('.a div')).to.be.undefined;
+      expect(selectorElement('.a .text')).to.be.undefined;
+      expect([...SELECTOR_ELEMENTS].sort()).to.deep.equal(['path', 'rect', 'text', 'tspan']);
+    });
+    for (const s of ['', '.a > .b', '.a + .b', '.a ~ .b', '.a  .b', ' .a', '.a ', '.a,.b', '.a[fill]',
       '[class~=x]', '.a:hover', '.a::before', '#x', '.a{', '.a;', '*', '.a *', '.a\t.b', '.1a']) {
       it(`refuses selector ${JSON.stringify(s)}`, () => expect(isValidSelector(s)).to.be.false);
     }
