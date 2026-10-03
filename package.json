@@ -1,0 +1,56 @@
+{
+  "name": "@franzzemen/visual-styles-format",
+  "version": "0.0.1",
+  "description": "Visual Styles file format: JSON shape, strict validation, CSS and Tailwind @theme generation. No I/O, no Angular, no DOM.",
+  "homepage": "https://github.com/FranzZemen/visual-styles-format#readme",
+  "bugs": {
+    "url": "https://github.com/FranzZemen/visual-styles-format/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FranzZemen/visual-styles-format.git"
+  },
+  "license": "UNLICENSED",
+  "author": "Franz Zemen",
+  "type": "module",
+  "scripts": {
+    "version": "node scripts/stamp-version.mjs && npx tsc -b && git add src/project/version.ts"
+  },
+  "devDependencies": {
+    "@franzzemen/build-system": "^36.3.0",
+    "@franzzemen/npmu": "^12.5.50",
+    "@franzzemen/safe-config": "^5.1.54",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.6.4",
+    "chai": "^6.3.0",
+    "mocha": "^12.0.3",
+    "typescript": "^7.0.2"
+  },
+  "exports": {
+    ".": {
+      "types": "./out/project/types/index.d.ts",
+      "import": "./out/project/index.js"
+    }
+  },
+  "imports": {
+    "#project": {
+      "types": "./out/project/types/project-index.d.ts",
+      "import": "./out/project/project-index.js"
+    }
+  },
+  "npmuDependencies": [
+    {
+      "path": "../safe-config",
+      "packageName": "@franzzemen/safe-config"
+    },
+    {
+      "path": "../npmu",
+      "packageName": "@franzzemen/npmu"
+    },
+    {
+      "path": "./",
+      "packageName": "@franzzemen/visual-styles-format"
+    }
+  ]
+}
