@@ -1,6 +1,6 @@
 {
   "name": "@franzzemen/visual-styles-format",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Visual Styles file format: JSON shape, strict validation, CSS and Tailwind @theme generation. No I/O, no Angular, no DOM.",
   "homepage": "https://github.com/FranzZemen/visual-styles-format#readme",
   "bugs": {
